@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
 
@@ -9,7 +9,7 @@ export default function Home() {
     percentage: number,
   }
 
-  let file = "";
+  let file: string = "";
   let file1 = "";
 
   const [topTenWord, setTopTenWord] = useState<object1[]>([]);
@@ -19,7 +19,7 @@ export default function Home() {
   const [characters, setCharacters] = useState(0);
   const [averageOfWordsInSentences, setAverageOfWordsInSentences] = useState(0);
   const [vocabulary, setVocabulary] = useState<string[]>([]);
-  const [text, setText] = useState<string[]>([]);
+  // const [text, setText] = useState<string[]>([]);
   const [vocabFromStory, setVocabFromStory] = useState<string[]>([]);
 
   const getConflictStoryVocab = () => {
@@ -216,75 +216,61 @@ export default function Home() {
     return words;
   }
   // ************************* upload short story .txt file and show ****************************
-  // source: https://www.positronx.io/understand-html5-filereader-api-to-upload-image-and-text-files/
-  // https://developer.mozilla.org/en-US/docs/Web/API/FileReader/load_event
-  const showShortStory = () => {
+  let bg: Array<string> = [];
+  const [text, setText] = useState<string[]>([]);
+  const showShortStory = (event: Event) => {
+    const preview = document.getElementById("show-text");
+    const reader = new FileReader();
+    const textFile = /text.*/;
+    const fileSelected = event.target ? event.target.files[0] : null;
     if(window.File && window.FileReader && window.FileList && window.Blob) {
-        const preview = document.getElementById("show-text");
-        // const SpecificFile = document.querySelector('input[type=file]').files[0];
-        const SpecificFile = document.getElementById("shortStory").files[0];
-        const reader = new FileReader();
-        const textFile = /text.*/;
-        if (SpecificFile.type.match(textFile)) {
-            reader.onloadstart = (event) => {
-              console.log("start");
-            }
-            reader.onload = (event) => {
-              const textOfFile = event.target?.result;
-              // setFile(textOfFile?.toString());
-              file = textOfFile?.toString();
-              // textOfFile?.toString().split("\n").map((item, key) => {
-                //     preview.innerHTML += `<p>${item}<br/></p>`
-                // })
-              }
-            reader.onloadend = (event) => {
-              setText(file.split('\n'));
-              console.log(text);
-              setParagraph(getParagraphCount());
-              setSentences(getSentenceCount());
-              setWords(getWordCount(file));
-              setCharacters(getCharacterCount());
-              setTopTenWord(unique(quickSort(getOrganizedWords(), 0, getOrganizedWords().length - 1)));
-              setAverageOfWordsInSentences(getAverageNumberOfWordsInSentence());
-              setVocabFromStory(uniqueReal(getVacobFromStory(file)));
-              console.log("Onloadend", topTenWord);
-            }
+      if (fileSelected.type.match(textFile)){
+        reader.onload = () => {
+          file = reader.result?.toString().toLocaleLowerCase();
         }
-        else {
-            preview.innerHTML = "<span class='error'>It doesn't seem to be a text file!</span>";
+        reader.onloadend = (event) => {
+          // text = file.split('\n');
+          setText(file.split("\n"));
+          setParagraph(getParagraphCount());
+          setSentences(getSentenceCount());
+          setWords(getWordCount(file));
+          setCharacters(getCharacterCount());
+          setTopTenWord(unique(quickSort(getOrganizedWords(), 0, getOrganizedWords().length - 1)));
+          setAverageOfWordsInSentences(getAverageNumberOfWordsInSentence());
+          setVocabFromStory(uniqueReal(getVacobFromStory(file)));
         }
-        reader.readAsText(SpecificFile);
+        reader.readAsText(fileSelected);
+      }
+      else {
+        alert("It doesn't seem to be a text file!");
+      }
     }
     else {
-        alert("Your browser is too old to support HTML5 File API");
+      alert("Your browser is too old to support HTML5 File API");
     }
   }
   // ************************* upload student vocabulary .txt file and show ****************************
-  const showVocabulary = () => {
+  const showVocabulary = (event: Event) => {
+    const preview = document.getElementById("show-text");
+    const reader = new FileReader();
+    const textFile = /text.*/;
+    const fileSelected = event.target ? event.target.files[0] : null;
     if(window.File && window.FileReader && window.FileList && window.Blob) {
-      const preview = document.getElementById("show-text");
-      const SpecificFile = document.getElementById('vocabulary').files[0];
-      const reader = new FileReader();
-      const textFile = /text.*/;
-      if (SpecificFile.type.match(textFile)) {
-          reader.onloadstart = (event) => {
-            console.log("start");
-          }
-          reader.onload = (event) => {
-            const textOfFile = event.target?.result;
-            file1 = textOfFile?.toString().toLocaleLowerCase();
-          }
-          reader.onloadend = (event) => {
-            setVocabulary(file1.split('\r\n'));
-          }
+      if (fileSelected.type.match(textFile)){
+        reader.onload = () => {
+          file = reader.result?.toString().toLocaleLowerCase();
+        }
+        reader.onloadend = () => {
+          setVocabulary(file.split('\r\n'));
+        }
+        reader.readAsText(fileSelected);
       }
       else {
-          preview.innerHTML = "<span class='error'>It doesn't seem to be a text file!</span>";
+        alert("It doesn't seem to be a text file!");
       }
-      reader.readAsText(SpecificFile);
     }
     else {
-        alert("Your browser is too old to support HTML5 File API");
+      alert("Your browser is too old to support HTML5 File API");
     }
   }
   // *********************** download button js *************************
@@ -357,6 +343,7 @@ export default function Home() {
               <br/>
               <br/>
             </p>
+              {console.log(text)}
               {(text && text.length > 0) && text?.map((item, key) => (
                 <p key={key}>{item} <br/> </p>
                 ))}
@@ -364,8 +351,8 @@ export default function Home() {
         </div>
         {/* ********************** file upload ********************** */}
         <div className={styles.Inputs}>
-          <input id="shortStory" type="file" multiple onChange={showShortStory}></input>
-          <input id="vocabulary" type="file" multiple onChange={showVocabulary}></input>
+          <input id="shortStory" type="file" onChange={showShortStory}></input>
+          <input id="vocabulary" type="file" onChange={showVocabulary}></input>
         </div>
         {/* ********************** download button ********************** */}
         <div className={styles.btnDiv}>
