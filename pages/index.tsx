@@ -221,7 +221,8 @@ export default function Home() {
   const showShortStory = () => {
     if(window.File && window.FileReader && window.FileList && window.Blob) {
         const preview = document.getElementById("show-text");
-        const SpecificFile = document.querySelector('input[type=file]').files[0];
+        // const SpecificFile = document.querySelector('input[type=file]').files[0];
+        const SpecificFile = document.getElementById("shortStory").files[0];
         const reader = new FileReader();
         const textFile = /text.*/;
         if (SpecificFile.type.match(textFile)) {
