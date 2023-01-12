@@ -1,6 +1,7 @@
-import React, { useRef, useState } from "react";
+import React, { ChangeEvent, useRef, useState } from "react";
 import Head from 'next/head'
 import styles from '../styles/Home.module.css'
+import { copyFileSync } from "fs";
 
 export default function Home() {  
   type object1 = {
@@ -218,15 +219,16 @@ export default function Home() {
   // ************************* upload short story .txt file and show ****************************
   let bg: Array<string> = [];
   const [text, setText] = useState<string[]>([]);
-  const showShortStory = (event: Event) => {
+  const showShortStory = (event: ChangeEvent<HTMLInputElement>) => {
     const preview = document.getElementById("show-text");
     const reader = new FileReader();
     const textFile = /text.*/;
-    const fileSelected = event.target ? event.target.files[0] : null;
+    const target = event.target as HTMLInputElement;
+    const fileSelected: any | null = target?.files && target?.files[0];
     if(window.File && window.FileReader && window.FileList && window.Blob) {
       if (fileSelected.type.match(textFile)){
         reader.onload = () => {
-          file = reader.result?.toString().toLocaleLowerCase();
+          file = reader.result?.toString().toLocaleLowerCase() || '';
         }
         reader.onloadend = (event) => {
           // text = file.split('\n');
@@ -249,16 +251,18 @@ export default function Home() {
       alert("Your browser is too old to support HTML5 File API");
     }
   }
+  // const [fileSelected, setFileSelected] = useState<File | null>(null);
   // ************************* upload student vocabulary .txt file and show ****************************
-  const showVocabulary = (event: Event) => {
-    const preview = document.getElementById("show-text");
+  const showVocabulary = (event: ChangeEvent<HTMLInputElement>) => {
     const reader = new FileReader();
     const textFile = /text.*/;
-    const fileSelected = event.target ? event.target.files[0] : null;
+    const target = event.target as HTMLInputElement;
+    const fileSelected: any | null = target?.files && target?.files[0];
+    // setFileSelected(target?.files && target?.files[0]);
     if(window.File && window.FileReader && window.FileList && window.Blob) {
       if (fileSelected.type.match(textFile)){
         reader.onload = () => {
-          file = reader.result?.toString().toLocaleLowerCase();
+          file = reader.result?.toString().toLocaleLowerCase() || '';
         }
         reader.onloadend = () => {
           setVocabulary(file.split('\r\n'));
