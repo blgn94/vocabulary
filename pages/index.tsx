@@ -343,7 +343,6 @@ export default function Home() {
               <br/>
               <br/>
             </p>
-              {console.log(text)}
               {(text && text.length > 0) && text?.map((item, key) => (
                 <p key={key}>{item} <br/> </p>
                 ))}
